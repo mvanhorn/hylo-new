@@ -75,6 +75,26 @@ final class SourceFileTests: XCTestCase {
     XCTAssertEqual(p2.description, "virtual://350c8wstjkie0:2:6")
   }
 
+  func testIndexLineColumn() throws {
+    let f = SourceFile.helloWorld
+    try XCTSkipIf(f.lineCount != 2)
+
+    // Line 1, column 1 -> start of file.
+    XCTAssertEqual(f.index(line: 1, column: 1), f.text.startIndex)
+
+    // Line 1, column 6 -> the comma.
+    let comma = try XCTUnwrap(f.text.firstIndex(of: ","))
+    XCTAssertEqual(f.index(line: 1, column: 6), comma)
+
+    // Line 2, column 1 -> first character of second line.
+    let line2Start = f.text.index(after: try XCTUnwrap(f.text.firstIndex(where: \.isNewline)))
+    XCTAssertEqual(f.index(line: 2, column: 1), line2Start)
+
+    // Line 2, column 6 -> the exclamation mark (last character).
+    let bang = try XCTUnwrap(f.text.firstIndex(of: "!"))
+    XCTAssertEqual(f.index(line: 2, column: 6), bang)
+  }
+
   func testArchive() throws {
     let f = SourceFile.helloWorld
     try XCTAssertEqual(f, f.storedAndLoaded())
