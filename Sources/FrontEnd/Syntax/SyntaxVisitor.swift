@@ -169,6 +169,13 @@ extension Program {
     visit(ps.usings, calling: &v)
   }
 
+  /// Visits the children of `sourceFile` in pre-order, calling back `visitor` when a node is entered or left.
+  public func visit(_ sourceFile: SourceFile.ID, calling visitor: inout some SyntaxVisitor) {
+    for decl in self[sourceFile].topLevelDeclarations {
+      visit(decl, calling: &visitor)
+    }
+  }
+
   /// Visits `cs` and their children in pre-order, calling back `v` when a node is entered or left.
   public func visit<T: SyntaxVisitor>(_ cs: CaptureList, calling v: inout T) {
     visit(cs.explicit, calling: &v)

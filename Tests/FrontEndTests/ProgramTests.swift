@@ -63,6 +63,53 @@ final class ProgramTests: XCTestCase {
     }
   }
 
+  func testVisitSourceFile() async throws {
+    struct Collector: SyntaxVisitor {
+      var entered: [SyntaxTag] = []
+      var exited: [SyntaxTag] = []
+
+      mutating func willEnter(_ node: AnySyntaxIdentity, in program: Program) -> Bool {
+        entered.append(program.tag(of: node))
+        return true
+      }
+
+      mutating func willExit(_ node: AnySyntaxIdentity, in program: Program) {
+        exited.append(program.tag(of: node))
+      }
+    }
+
+    var p = Program()
+    let m = p.demandModule(.init("TestModule"))
+    let (_, f) = p[m].addSource(
+      """
+      trait P {
+        type X
+        type Y
+      }
+      """)
+    for mod in p.moduleIdentities { await p.assignScopes(mod) }
+
+    var collector = Collector()
+    p.visit(f, calling: &collector)
+
+    // Pre-order traversal: TraitDeclaration first, then its two AssociatedTypeDeclaration members.
+    XCTAssertEqual(
+      collector.entered,
+      [
+        SyntaxTag(TraitDeclaration.self),
+        SyntaxTag(AssociatedTypeDeclaration.self),
+        SyntaxTag(AssociatedTypeDeclaration.self),
+      ])
+    
+    XCTAssertEqual(
+      collector.exited,
+      [
+        SyntaxTag(AssociatedTypeDeclaration.self),
+        SyntaxTag(AssociatedTypeDeclaration.self),
+        SyntaxTag(TraitDeclaration.self),
+      ])
+  }
+
   func testSerializationWithDependencies() throws {
     let p = Program.test
 
