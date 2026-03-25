@@ -190,7 +190,7 @@ internal struct IREmitter {
       for m in ms { lower(m) }
     }
 
-    // TODO: Construct the function that projects the witness.
+    // TODO: Construct the function that projects the witness. <- maybe this?
     withClearContext({ (me) in me.lowerDefinitionInClearContext(d) })
   }
 
