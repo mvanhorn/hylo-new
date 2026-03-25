@@ -849,7 +849,7 @@ internal struct IREmitter {
       }
 
     default:
-      unreachable()
+      unreachable("Unexpected \(program.declaration(referredToBy: e)))")
     }
   }
 
