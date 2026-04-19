@@ -9,7 +9,7 @@ final class LoweringTests: XCTestCase {
 
         let m0 = d.program.demandModule(.init("M0"))
 
-        d.program[m0].addDependency(.standardLibrary)
+        d.program[m0].addDependency(Module.standardLibraryName)
 
         _ = d.program[m0].addSource(
             """
@@ -25,10 +25,10 @@ final class LoweringTests: XCTestCase {
 
         await d.program.assignScopes(m0)
         try assertNoDiagnostics(in: d.program)
-        d.program.assignTypes(m0)
+        d.program.assignTypes(m0, loggingInferenceWhere: {_, _ in false})
         try assertNoDiagnostics(in: d.program)
         d.program.lower(m0)
-        d.program.lower(d.program.modules[.standardLibrary]!.identity)
+        d.program.lower(d.program.modules[Module.standardLibraryName]!.identity)
 
         var p1 = TreePrinter(program: d.program)
         XCTAssertEqual(
@@ -39,7 +39,7 @@ final class LoweringTests: XCTestCase {
 
         try assertNoDiagnostics(in: d.program)
         d.program.applyTransformationPasses(m0)
-        d.program.applyTransformationPasses(d.program.modules[.standardLibrary]!.identity)
+        d.program.applyTransformationPasses(d.program.modules[Module.standardLibraryName]!.identity)
 
     }
 }

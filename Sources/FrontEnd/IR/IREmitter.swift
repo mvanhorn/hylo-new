@@ -849,7 +849,7 @@ internal struct IREmitter {
       }
 
     default:
-      unreachable("Unexpected \(program.declaration(referredToBy: e)))")
+      unreachable()
     }
   }
 
@@ -1271,7 +1271,7 @@ internal struct IREmitter {
     let abstraction = program.types.seenAsTermAbstraction(program.type(assignedTo: d))!
     var result: [IRParameter] = []
 
-    precondition(program.tag(of: d) == FunctionDeclaration.self, "TODO")
+    precondition(program.tag(of: d) == FunctionDeclaration.self, "TODO - unimplemented lowering for \(program.tag(of: d))")
 
     // Parameters of memberwise initializers have no explicit declarations.
     if program.isMemberwiseInitializer(d) {
